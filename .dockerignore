@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment (Docker will create its own!)
+.venv/
+venv/
+ENV/
+
+# Git
+.git/
+.gitignore
+
+# Testing and IDE
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.vscode/
+.idea/
+
+# Local Database (Optional: remove this if you want to keep your local db,
+# but it's cleaner to let Docker create a fresh one)
+bookmarks.db
