@@ -21,11 +21,7 @@ async def generate_bookmark_summary(title: str, url: str) -> str:
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
                 OLLAMA_API_URL,
-                json={
-                    "model": "llama3.2",
-                    "prompt": prompt,
-                    "stream": False
-                }
+                json={"model": "llama3.2", "prompt": prompt, "stream": False},
             )
 
         response.raise_for_status()
