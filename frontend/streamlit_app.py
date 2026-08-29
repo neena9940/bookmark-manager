@@ -206,7 +206,7 @@ def main_dashboard():
                         <div>
                             {"".join([f'<span class="tag">{tag["name"]}</span>' for tag in bookmark.get("tags", [])])}
                         </div>
-                        <small style="color: #999;">Created: {bookmark["created_at"][:10]}</small>
+                        <small style="color: #999">Created: {bookmark["created_at"][:10]}</small>
                     </div>
                     """,
                         unsafe_allow_html=True,
