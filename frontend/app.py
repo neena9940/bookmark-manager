@@ -1,5 +1,5 @@
-import streamlit as st
 import requests
+import streamlit as st
 
 # --- Configuration ---
 API_URL = "http://127.0.0.1:8000/api/v1"
@@ -10,8 +10,7 @@ st.set_page_config(page_title="AI Bookmark Manager", layout="wide")
 # --- Helper Functions ---
 def login(email, password):
     response = requests.post(
-        f"{API_URL}/auth/login",
-        data={"username": email, "password": password}
+        f"{API_URL}/auth/login", data={"username": email, "password": password}
     )
     if response.status_code == 200:
         return response.json()["access_token"]
@@ -37,15 +36,16 @@ def create_bookmark(token, title, url, tag_id=None):
         "title": title,
         "url": url,
         "notes": None,  # Let the AI handle it!
-        "tag_id": tag_id
+        "tag_id": tag_id,
     }
     try:
         response = requests.post(
-            f"{API_URL}/bookmarks/",
-            headers=get_headers(token),
-            json=payload
+            f"{API_URL}/bookmarks/", headers=get_headers(token), json=payload
         )
-        return response.status_code == 200, response.json() if response.status_code == 200 else None
+        return (
+            response.status_code == 200,
+            response.json() if response.status_code == 200 else None,
+        )
     except Exception as e:
         st.error(f"Error creating bookmark: {e}")
         return False, None
@@ -66,7 +66,7 @@ def main():
     st.title("🤖 AI-Powered Bookmark Manager")
 
     # Initialize session state
-    if 'token' not in st.session_state:
+    if "token" not in st.session_state:
         st.session_state.token = None
 
     # Sidebar for Login/Logout
@@ -106,11 +106,17 @@ def main():
             tags = get_tags(token)
 
             if tags:
-                tag_options = {tag['name']: tag['id'] for tag in tags}
-                selected_tag = st.selectbox("Select Tag (Optional)", options=["None"] + list(tag_options.keys()))
-                tag_id = tag_options.get(selected_tag) if selected_tag != "None" else None
+                tag_options = {tag["name"]: tag["id"] for tag in tags}
+                selected_tag = st.selectbox(
+                    "Select Tag (Optional)", options=["None"] + list(tag_options.keys())
+                )
+                tag_id = (
+                    tag_options.get(selected_tag) if selected_tag != "None" else None
+                )
             else:
-                st.info("No tags found. You can create bookmarks without tags, or add tags via the API docs.")
+                st.info(
+                    "No tags found. You can create bookmarks without tags, or add tags via the API docs."
+                )
                 tag_id = None
 
             submitted = st.form_submit_button("Save & Generate AI Summary")
@@ -139,9 +145,13 @@ def main():
             for bm in bookmarks:
                 with st.expander(f"🔖 {bm['title']}"):
                     st.markdown(f"**URL:** [{bm['url']}]({bm['url']})")
-                    st.markdown(f"**AI Summary:** {bm.get('notes', 'No summary available.')}")
+                    st.markdown(
+                        f"**AI Summary:** {bm.get('notes', 'No summary available.')}"
+                    )
                     tag_info = f"Tag ID: {bm.get('tag_id', 'None')}"
-                    st.caption(f"{tag_info} | Created: {bm.get('created_at', 'Unknown')}")
+                    st.caption(
+                        f"{tag_info} | Created: {bm.get('created_at', 'Unknown')}"
+                    )
 
 
 if __name__ == "__main__":

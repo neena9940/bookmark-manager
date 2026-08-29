@@ -1,18 +1,23 @@
 from datetime import datetime, timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.core.database import get_db
-from app.core.security import (
-    create_access_token, create_refresh_token_value, hash_token, verify_token_hash,
-    verify_password, get_password_hash
-)
-from app.models.user import User
-from app.models.refresh_token import RefreshToken
-from app.schemas.user import UserCreate, UserResponse
-from app.core.limiter import limiter
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.database import get_db
+from app.core.limiter import limiter
+from app.core.security import (
+    create_access_token,
+    create_refresh_token_value,
+    get_password_hash,
+    hash_token,
+    verify_password,
+    verify_token_hash,
+)
+from app.models.refresh_token import RefreshToken
+from app.models.user import User
+from app.schemas.user import UserCreate, UserResponse
 
 router = APIRouter()
 
@@ -20,23 +25,26 @@ router = APIRouter()
 @router.post("/register", response_model=UserResponse)
 async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     # ... (keep your existing register logic, just make sure to set role="user" if needed) ...
-    user = User(email=user_in.email, hashed_password=get_password_hash(user_in.password), role="user")
+    user = User(
+        email=user_in.email,
+        hashed_password=get_password_hash(user_in.password),
+        role="user",
+    )
     db.add(user)
     await db.commit()
     await db.refresh(user)
     return user
 
 
-
-
 @router.post("/login")
-@limiter.limit("5/minute") # ✅ THE MAGIC LINE: Max 5 logins per minute per IP!
+@limiter.limit("5/minute")  # ✅ THE MAGIC LINE: Max 5 logins per minute per IP!
 async def login(
-    request: Request, # ✅ MUST BE FIRST!
+    request: Request,  # ✅ MUST BE FIRST!
     form_data: OAuth2PasswordRequestForm = Depends(),
-    db: AsyncSession = Depends(get_db)):
+    db: AsyncSession = Depends(get_db),
+):
 
-#async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+    # async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     # 1. Verify User
     result = await db.execute(select(User).where(User.email == form_data.username))
     user = result.scalar_one_or_none()
@@ -51,7 +59,7 @@ async def login(
     refresh_db = RefreshToken(
         user_id=user.id,
         token_hash=hash_token(refresh_token_value),
-        expires_at=datetime.utcnow() + timedelta(days=7)
+        expires_at=datetime.utcnow() + timedelta(days=7),
     )
     db.add(refresh_db)
     await db.commit()
@@ -59,7 +67,7 @@ async def login(
     return {
         "access_token": access_token,
         "refresh_token": refresh_token_value,  # Send raw token to client ONCE
-        "token_type": "bearer"
+        "token_type": "bearer",
     }
 
 
@@ -67,7 +75,9 @@ async def login(
 async def refresh_token(refresh_token: str, db: AsyncSession = Depends(get_db)):
     """Exchange a valid refresh token for a new access token"""
     # 1. Find all tokens for this user (In production, you'd search by token_hash directly)
-    result = await db.execute(select(RefreshToken).where(RefreshToken.revoked_at.is_(None)))
+    result = await db.execute(
+        select(RefreshToken).where(RefreshToken.revoked_at.is_(None))
+    )
     tokens = result.scalars().all()
 
     valid_token = None

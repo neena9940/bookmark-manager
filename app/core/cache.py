@@ -1,16 +1,19 @@
 import json
-import redis.asyncio as aioredis
-from app.core.config import settings
 from datetime import datetime
+
+import redis.asyncio as aioredis
+
+from app.core.config import settings
 
 # Global variable to hold the Redis connection
 _redis = None
+
 
 # ✅ NEW: Custom JSON Encoder to handle Python datetime objects
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
-            return obj.isoformat() # Convert datetime to string
+            return obj.isoformat()  # Convert datetime to string
         return super().default(obj)
 
 
@@ -22,8 +25,11 @@ async def get_redis_client():
     global _redis
     if _redis is None:
         # Connect to the same Redis instance we use for ARQ
-        _redis = await aioredis.from_url(settings.REDIS_URL, encoding="utf-8", decode_responses=True)
+        _redis = await aioredis.from_url(
+            settings.REDIS_URL, encoding="utf-8", decode_responses=True
+        )
     return _redis
+
 
 async def set_cache(key: str, value, expire: int = 300):
     try:
@@ -35,6 +41,7 @@ async def set_cache(key: str, value, expire: int = 300):
     except Exception as e:
         print(f"❌ Redis SET failed: {e}")
         raise
+
 
 async def get_cache(key: str):
     try:
@@ -49,6 +56,7 @@ async def get_cache(key: str):
     except Exception as e:
         print(f"❌ Redis GET failed: {e}")
         return None
+
 
 async def delete_cache(key: str):
     """

@@ -1,5 +1,6 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models.bookmark import Bookmark
 
 
@@ -12,7 +13,7 @@ async def get_bookmark_by_id(db: AsyncSession, bookmark_id: int, owner_id: int):
     query = select(Bookmark).where(
         Bookmark.id == bookmark_id,
         Bookmark.owner_id == owner_id,
-        Bookmark.deleted_at.is_(None)  # Don't return soft-deleted items
+        Bookmark.deleted_at.is_(None),  # Don't return soft-deleted items
     )
 
     # 2. Execute and return

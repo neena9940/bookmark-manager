@@ -1,22 +1,23 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
 from app.api.deps import get_current_user
 from app.core.database import get_db
-from app.core.storage import upload_file, get_presigned_url
+from app.core.storage import get_presigned_url, upload_file
 from app.models.bookmark import Bookmark
 from app.models.user import User
-from sqlalchemy.orm import selectinload
 
 router = APIRouter()
 
 
 @router.post("/bookmarks/{bookmark_id}/screenshot")
 async def upload_screenshot(
-        bookmark_id: int,
-        file: UploadFile = File(...),
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user),
+    bookmark_id: int,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     # 1. Security: Verify the bookmark exists and belongs to this user
     # 1. Security: Verify the bookmark exists and belongs to this user
@@ -35,7 +36,9 @@ async def upload_screenshot(
 
     # 2. Validation: Only allow images, max 5MB
     if file.content_type not in ["image/png", "image/jpeg", "image/jpg"]:
-        raise HTTPException(status_code=400, detail="Only PNG and JPEG images are allowed")
+        raise HTTPException(
+            status_code=400, detail="Only PNG and JPEG images are allowed"
+        )
 
     contents = await file.read()
     if len(contents) > 5 * 1024 * 1024:  # 5 Megabytes

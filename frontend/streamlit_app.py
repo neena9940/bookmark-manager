@@ -1,7 +1,7 @@
-import streamlit as st
-import requests
 import time
-from datetime import datetime
+
+import requests
+import streamlit as st
 
 # Configuration
 API_URL = "http://127.0.0.1:8000/api/v1"
@@ -11,11 +11,12 @@ st.set_page_config(
     page_title="Bookmark Manager Pro",
     page_icon="",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
 # Custom CSS to make it NOT look like Streamlit
-st.markdown("""
+st.markdown(
+    """
 <style>
     /* Hide Streamlit branding */
     #MainMenu {visibility: hidden;}
@@ -45,7 +46,9 @@ st.markdown("""
         margin-bottom: 5px;
     }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # Initialize session state
 if "access_token" not in st.session_state:
@@ -76,7 +79,7 @@ def login_page():
             try:
                 response = requests.post(
                     f"{API_URL}/auth/login",
-                    data={"username": email, "password": password}
+                    data={"username": email, "password": password},
                 )
 
                 if response.status_code == 200:
@@ -87,7 +90,9 @@ def login_page():
                     time.sleep(0.5)
                     st.rerun()
                 else:
-                    st.error(f"Login failed: {response.json().get('detail', 'Unknown error')}")
+                    st.error(
+                        f"Login failed: {response.json().get('detail', 'Unknown error')}"
+                    )
             except Exception as e:
                 st.error(f"Connection error: {str(e)}")
 
@@ -99,13 +104,15 @@ def login_page():
             try:
                 response = requests.post(
                     f"{API_URL}/auth/register",
-                    json={"email": reg_email, "password": reg_password}
+                    json={"email": reg_email, "password": reg_password},
                 )
 
                 if response.status_code == 200:
                     st.success("Account created! Please login.")
                 else:
-                    st.error(f"Registration failed: {response.json().get('detail', 'Unknown error')}")
+                    st.error(
+                        f"Registration failed: {response.json().get('detail', 'Unknown error')}"
+                    )
             except Exception as e:
                 st.error(f"Connection error: {str(e)}")
 
@@ -130,8 +137,12 @@ def main_dashboard():
         with st.form("add_bookmark_form", clear_on_submit=True):
             title = st.text_input("Title")
             url = st.text_input("URL")
-            tags = st.text_input("Tags (comma separated)", placeholder="python, backend")
-            submitted = st.form_submit_button("Add Bookmark", type="primary", use_container_width=True)
+            tags = st.text_input(
+                "Tags (comma separated)", placeholder="python, backend"
+            )
+            submitted = st.form_submit_button(
+                "Add Bookmark", type="primary", use_container_width=True
+            )
 
             if submitted:
                 tag_list = [t.strip() for t in tags.split(",") if t.strip()]
@@ -140,11 +151,7 @@ def main_dashboard():
                     response = requests.post(
                         f"{API_URL}/bookmarks/",
                         headers=get_headers(),
-                        json={
-                            "title": title,
-                            "url": url,
-                            "tag_names": tag_list
-                        }
+                        json={"title": title, "url": url, "tag_names": tag_list},
                     )
 
                     if response.status_code == 200:
@@ -173,7 +180,7 @@ def main_dashboard():
         response = requests.get(
             f"{API_URL}/bookmarks/",
             headers=get_headers(),
-            params={"page": page, "size": size, "search": search}
+            params={"page": page, "size": size, "search": search},
         )
 
         if response.status_code == 200:
@@ -182,23 +189,28 @@ def main_dashboard():
             total = data["total"]
             total_pages = data["pages"]
 
-            st.markdown(f"**Showing {len(bookmarks)} of {total} bookmarks** (Page {page}/{total_pages})")
+            st.markdown(
+                f"**Showing {len(bookmarks)} of {total} bookmarks** (Page {page}/{total_pages})"
+            )
             st.markdown("---")
 
             # Display bookmarks
             for bookmark in bookmarks:
                 with st.container():
-                    st.markdown(f"""
+                    st.markdown(
+                        f"""
                     <div class="bookmark-card">
-                        <h3>{bookmark['title']}</h3>
-                        <p style="color: #666; font-size: 14px;">{bookmark['url']}</p>
-                        <p>{bookmark.get('notes', 'No summary yet...')}</p>
+                        <h3>{bookmark["title"]}</h3>
+                        <p style="color: #666; font-size: 14px;">{bookmark["url"]}</p>
+                        <p>{bookmark.get("notes", "No summary yet...")}</p>
                         <div>
-                            {''.join([f'<span class="tag">{tag["name"]}</span>' for tag in bookmark.get('tags', [])])}
+                            {"".join([f'<span class="tag">{tag["name"]}</span>' for tag in bookmark.get("tags", [])])}
                         </div>
-                        <small style="color: #999;">Created: {bookmark['created_at'][:10]}</small>
+                        <small style="color: #999;">Created: {bookmark["created_at"][:10]}</small>
                     </div>
-                    """, unsafe_allow_html=True)
+                    """,
+                        unsafe_allow_html=True,
+                    )
                     st.markdown("---")
 
             # Navigation

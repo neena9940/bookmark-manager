@@ -1,6 +1,6 @@
 import httpx
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+
 from app.core.database import AsyncSessionLocal
 from app.models.bookmark import Bookmark
 
@@ -11,11 +11,8 @@ async def summarize_bookmark(ctx, bookmark_id: int):
     """
     # 1. Create a new DB session for this background process
     async with AsyncSessionLocal() as db:
-
         # 2. Fetch the bookmark from the database
-        result = await db.execute(
-            select(Bookmark).where(Bookmark.id == bookmark_id)
-        )
+        result = await db.execute(select(Bookmark).where(Bookmark.id == bookmark_id))
         bookmark = result.scalar_one_or_none()
 
         # 3. Safety check: Did the user soft-delete it while it was in the queue?

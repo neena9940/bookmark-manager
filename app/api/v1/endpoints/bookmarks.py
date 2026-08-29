@@ -1,20 +1,19 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy import select, or_
+from slugify import slugify
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
-from app.core.ai_service import generate_bookmark_summary
 from app.core.database import get_db
-from app.core.worker import REDIS_SETTINGS, create_pool  # NEW IMPORTS
-from app.models.bookmark import Bookmark
-from app.models.user import User
-from app.models.tag import Tag
-from app.schemas.bookmark import BookmarkCreate, BookmarkResponse, BookmarkUpdate
-from slugify import slugify
-from datetime import datetime
-from sqlalchemy import func
 from app.core.limiter import limiter
+from app.core.worker import REDIS_SETTINGS, create_pool  # NEW IMPORTS
 from app.crud.bookmarks import get_bookmark_by_id
+from app.models.bookmark import Bookmark
+from app.models.tag import Tag
+from app.models.user import User
+from app.schemas.bookmark import BookmarkCreate, BookmarkResponse, BookmarkUpdate
 from app.schemas.common import PaginatedResponse
 
 router = APIRouter()
@@ -45,9 +44,9 @@ async def get_or_create_tags(db: AsyncSession, tag_names: list[str]) -> list[Tag
 
 @router.post("/", response_model=BookmarkResponse)
 async def create_bookmark(
-        bookmark_in: BookmarkCreate,
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user),
+    bookmark_in: BookmarkCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     # 1. Create the bookmark with a placeholder note
     bookmark = Bookmark(
@@ -77,18 +76,16 @@ async def create_bookmark(
 from app.core.cache import get_cache, set_cache  # Make sure this is imported!
 
 
-
-
 @router.get("/", response_model=PaginatedResponse[BookmarkResponse])
 @limiter.limit("30/minute")
 async def get_bookmarks(
-        request: Request,
-        search: str | None = None,
-        tag_id: int | None = None,
-        page: int = 1,  # ✅ NEW: Default to page 1
-        size: int = 20,  # ✅ NEW: Default to 20 items per page
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user),
+    request: Request,
+    search: str | None = None,
+    tag_id: int | None = None,
+    page: int = 1,  # ✅ NEW: Default to page 1
+    size: int = 20,  # ✅ NEW: Default to 20 items per page
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     # 1. Create cache key (include page and size!)
     cache_key = f"bookmarks:{current_user.id}:{search}:{tag_id}:{page}:{size}"
@@ -103,8 +100,7 @@ async def get_bookmarks(
 
     # 3. Build the base query
     query = select(Bookmark).where(
-        Bookmark.owner_id == current_user.id,
-        Bookmark.deleted_at.is_(None)
+        Bookmark.owner_id == current_user.id, Bookmark.deleted_at.is_(None)
     )
 
     if search:
@@ -132,31 +128,29 @@ async def get_bookmarks(
     bookmarks = result.scalars().all()
 
     # 7. Convert to JSON
-    bookmark_dicts = [BookmarkResponse.model_validate(b).model_dump(mode='json') for b in bookmarks]
+    bookmark_dicts = [
+        BookmarkResponse.model_validate(b).model_dump(mode="json") for b in bookmarks
+    ]
 
     # 8. Calculate total pages
     total_pages = (total + size - 1) // size  # Ceiling division
 
     # 9. Build the response
     response = PaginatedResponse(
-        items=bookmark_dicts,
-        total=total,
-        page=page,
-        size=size,
-        pages=total_pages
+        items=bookmark_dicts, total=total, page=page, size=size, pages=total_pages
     )
 
     # 10. Save to cache
-    await set_cache(cache_key, response.model_dump(mode='json'), expire=60)
+    await set_cache(cache_key, response.model_dump(mode="json"), expire=60)
 
     return response
 
 
 @router.get("/{bookmark_id}", response_model=BookmarkResponse)
 async def read_bookmark(
-        bookmark_id: int,
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user),
+    bookmark_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     # ✅ ONE CLEAN LINE using our new CRUD function!
     bookmark = await get_bookmark_by_id(db, bookmark_id, current_user.id)
@@ -166,12 +160,13 @@ async def read_bookmark(
 
     return bookmark
 
+
 @router.put("/{bookmark_id}", response_model=BookmarkResponse)
 async def update_bookmark(
-        bookmark_id: int,
-        bookmark_in: BookmarkUpdate,
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user),
+    bookmark_id: int,
+    bookmark_in: BookmarkUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     result = await db.execute(
         select(Bookmark).where(
@@ -204,9 +199,9 @@ async def update_bookmark(
 
 @router.delete("/{bookmark_id}")
 async def delete_bookmark(
-        bookmark_id: int,
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user),
+    bookmark_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     result = await db.execute(
         select(Bookmark).where(

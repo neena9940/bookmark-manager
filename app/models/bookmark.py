@@ -1,9 +1,10 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, func, Table
-from sqlalchemy.orm import relationship
 from datetime import datetime
+
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
 from app.core.database import Base
 from app.models.tag import bookmark_tag
-
 
 
 class Bookmark(Base):
@@ -24,13 +25,12 @@ class Bookmark(Base):
     # ✅ NEW: Stores the S3 path, NOT the actual file
     screenshot_key = Column(String, nullable=True)
 
-    #Normalization - Removed
-    #tag_id = Column(Integer, ForeignKey("tags.id"), nullable=True)  # Keeping your original single tag for now
+    # Normalization - Removed
+    # tag_id = Column(Integer, ForeignKey("tags.id"), nullable=True)  # Keeping your original single tag for now
 
     # 3. Relationships
     owner = relationship("User", back_populates="bookmarks")
     # The new Many-to-Many relationship
-    tags = relationship("Tag",
-                        secondary=bookmark_tag,
-                        back_populates="bookmarks",
-                        lazy="selectin" )
+    tags = relationship(
+        "Tag", secondary=bookmark_tag, back_populates="bookmarks", lazy="selectin"
+    )

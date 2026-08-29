@@ -16,7 +16,6 @@ class Settings(BaseSettings):
     S3_BUCKET: str = "bookmarks"
     S3_REGION: str = "us-east-1"
 
-
     class Config:
         env_file = ".env"
 

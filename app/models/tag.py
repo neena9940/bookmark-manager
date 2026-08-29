@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Table, ForeignKey
+from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
+
 from app.core.database import Base
 
 # Junction table for Many-to-Many
@@ -17,13 +18,9 @@ class Tag(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True, nullable=False)
 
-
     slug = Column(String, unique=True, index=True, nullable=False)
 
     # Relationship to Bookmarks
     bookmarks = relationship(
-        "Bookmark",
-        secondary=bookmark_tag,
-        back_populates="tags",
-        lazy="selectin"
+        "Bookmark", secondary=bookmark_tag, back_populates="tags", lazy="selectin"
     )
