@@ -23,14 +23,26 @@ async def summarize_bookmark(ctx, bookmark_id: int):
         try:
             # 4. Call the local Ollama AI asynchronously
             async with httpx.AsyncClient(timeout=60.0) as client:
+
+                # 1. Prepare the prompt first to keep lines short
+                prompt_text = "Summarize this webpage in one sentence: "
+                prompt_text += f"{bookmark.url}\n\nTitle: {bookmark.title}"
+
+                # 2. Prepare the JSON payload
+                payload = {
+                    "model": "llama3.2",
+                    "prompt": prompt_text,
+                    "stream": False,
+                }
+
+                # 3. Make the request
                 response = await client.post(
                     "http://localhost:11434/api/generate",
-                    json={
-                        "model": "llama3.2",
-                        "prompt": f"Summarize this webpage in one sentence: {bookmark.url}\n\nTitle: {bookmark.title}",
-                        "stream": False,
-                    },
+                    json=payload
                 )
+
+                response.raise_for_status()
+                data = response.json()
                 response.raise_for_status()  # Raise error if HTTP status is 4xx or 5xx
                 data = response.json()
                 summary = data.get("response", "").strip()

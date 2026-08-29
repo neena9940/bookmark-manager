@@ -115,7 +115,7 @@ def main():
                 )
             else:
                 st.info(
-                    "No tags found. You can create bookmarks without tags, or add tags via the API docs."
+                    "No tags found. Create bookmarks with tags via the API."
                 )
                 tag_id = None
 

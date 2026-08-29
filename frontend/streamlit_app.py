@@ -90,8 +90,9 @@ def login_page():
                     time.sleep(0.5)
                     st.rerun()
                 else:
+                    detail = response.json().get('detail', 'Unknown error')
                     st.error(
-                        f"Login failed: {response.json().get('detail', 'Unknown error')}"
+                        f"Login failed: {detail}"
                     )
             except Exception as e:
                 st.error(f"Connection error: {str(e)}")
@@ -110,8 +111,9 @@ def login_page():
                 if response.status_code == 200:
                     st.success("Account created! Please login.")
                 else:
+                    detail = response.json().get('detail', 'Unknown error')
                     st.error(
-                        f"Registration failed: {response.json().get('detail', 'Unknown error')}"
+                        f"Registration failed: {detail}"
                     )
             except Exception as e:
                 st.error(f"Connection error: {str(e)}")
@@ -209,7 +211,9 @@ def main_dashboard():
                         f"""
                         <div class="bookmark-card">
                             <h3>{bookmark["title"]}</h3>
-                            <p style="color: #666; font-size: 14px">{bookmark["url"]}</p>
+                            <p style="color: #666; font-size: 14px">
+                                {bookmark["url"]}
+                            </p>
                             <p>{bookmark.get("notes", "No summary yet...")}</p>
                             <div>
                                 {tags_html}
