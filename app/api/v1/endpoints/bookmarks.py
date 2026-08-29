@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
+from app.core.cache import get_cache, set_cache  # Make sure this is imported!
 from app.core.database import get_db
 from app.core.limiter import limiter
 from app.core.worker import REDIS_SETTINGS, create_pool  # NEW IMPORTS
@@ -15,8 +16,6 @@ from app.models.tag import Tag
 from app.models.user import User
 from app.schemas.bookmark import BookmarkCreate, BookmarkResponse, BookmarkUpdate
 from app.schemas.common import PaginatedResponse
-from app.core.cache import get_cache, set_cache  # Make sure this is imported!
-
 
 router = APIRouter()
 
