@@ -32,10 +32,10 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_refresh_tokens_id'), 'refresh_tokens', ['id'], unique=False)
     op.create_index(op.f('ix_refresh_tokens_token_hash'), 'refresh_tokens', ['token_hash'], unique=False)
-    op.alter_column('users', 'role',
-               existing_type=sa.VARCHAR(),
-               nullable=False,
-               existing_server_default=sa.text("'user'"))
+    #op.alter_column('users', 'role',
+    #           existing_type=sa.VARCHAR(),
+    #           nullable=False,
+    #           existing_server_default=sa.text("'user'"))
     # ### end Alembic commands ###
 
 
