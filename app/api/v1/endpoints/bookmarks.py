@@ -74,8 +74,6 @@ async def create_bookmark(
     return bookmark
 
 
-
-
 @router.get("/", response_model=PaginatedResponse[BookmarkResponse])
 @limiter.limit("30/minute")
 async def get_bookmarks(

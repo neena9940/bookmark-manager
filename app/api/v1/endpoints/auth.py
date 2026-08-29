@@ -74,10 +74,7 @@ async def login(
 
 
 @router.post("/refresh")
-async def refresh_token(
-    refresh_token: str,
-    db: AsyncSession = Depends(get_db)
-):
+async def refresh_token(refresh_token: str, db: AsyncSession = Depends(get_db)):
     """Exchange a valid refresh token for a new access token"""
     # 1. Find all tokens for this user
     #    (In production, search by token_hash directly)
