@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from arq import create_pool  # NEW IMPORTS
 from fastapi import APIRouter, Depends, HTTPException, Request
 from slugify import slugify
 from sqlalchemy import func, select
@@ -10,7 +11,6 @@ from app.core.cache import get_cache, set_cache  # Make sure this is imported!
 from app.core.database import get_db
 from app.core.limiter import limiter
 from app.core.worker import REDIS_SETTINGS
-from arq import create_pool # NEW IMPORTS
 from app.crud.bookmarks import get_bookmark_by_id
 from app.models.bookmark import Bookmark
 from app.models.tag import Tag
