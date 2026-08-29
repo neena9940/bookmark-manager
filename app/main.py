@@ -15,8 +15,6 @@ async def lifespan(app: FastAPI):
     yield
 
 
-limiter = Limiter(key_func=get_remote_address)
-
 app = FastAPI(title="Bookmark Manager", lifespan=lifespan)
 app.include_router(api_router, prefix="/api/v1")
 

@@ -15,6 +15,8 @@ from app.models.tag import Tag
 from app.models.user import User
 from app.schemas.bookmark import BookmarkCreate, BookmarkResponse, BookmarkUpdate
 from app.schemas.common import PaginatedResponse
+from app.core.cache import get_cache, set_cache  # Make sure this is imported!
+
 
 router = APIRouter()
 
@@ -73,7 +75,6 @@ async def create_bookmark(
     return bookmark
 
 
-from app.core.cache import get_cache, set_cache  # Make sure this is imported!
 
 
 @router.get("/", response_model=PaginatedResponse[BookmarkResponse])
