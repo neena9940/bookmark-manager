@@ -12,4 +12,6 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
 
+    # ✅ NEW: Default role is "user". Admins will be "admin".
+    role = Column(String, default="user", nullable=False)
     bookmarks = relationship("Bookmark", back_populates="owner")

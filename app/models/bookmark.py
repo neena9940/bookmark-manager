@@ -1,24 +1,36 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, func, Table
 from sqlalchemy.orm import relationship
-
+from datetime import datetime
 from app.core.database import Base
+from app.models.tag import bookmark_tag
+
 
 
 class Bookmark(Base):
     __tablename__ = "bookmarks"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
+    title = Column(String, index=True, nullable=False)
     url = Column(String, nullable=False)
-    notes = Column(Text, nullable=True)
+    notes = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
-    tag_id = Column(Integer, ForeignKey("tags.id"), nullable=True)
+    # 2. Soft Delete Column (Phase 1.2)
+    deleted_at = Column(DateTime, nullable=True, default=None)
 
-    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    # Foreign Keys
+    owner_id = Column(Integer, ForeignKey("users.id"))
 
-    created_at = Column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    # ✅ NEW: Stores the S3 path, NOT the actual file
+    screenshot_key = Column(String, nullable=True)
 
-    tag = relationship("Tag", back_populates="bookmarks")
+    #Normalization - Removed
+    #tag_id = Column(Integer, ForeignKey("tags.id"), nullable=True)  # Keeping your original single tag for now
+
+    # 3. Relationships
     owner = relationship("User", back_populates="bookmarks")
+    # The new Many-to-Many relationship
+    tags = relationship("Tag",
+                        secondary=bookmark_tag,
+                        back_populates="bookmarks",
+                        lazy="selectin" )

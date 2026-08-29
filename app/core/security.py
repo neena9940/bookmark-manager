@@ -1,33 +1,34 @@
-from datetime import datetime, timedelta
-
 import bcrypt
+import hashlib
+from datetime import datetime, timedelta
 from jose import jwt
-
 from app.core.config import settings
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    # bcrypt requires bytes, not strings, so we encode them
-    password_byte_enc = plain_password.encode("utf-8")
-    hashed_password_byte_enc = hashed_password.encode("utf-8")
-    return bcrypt.checkpw(password_byte_enc, hashed_password_byte_enc)
-
+import secrets
 
 def get_password_hash(password: str) -> str:
-    pwd_bytes = password.encode("utf-8")
+    """Hashes a password using bcrypt"""
     salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
-    # The database expects a string, so we decode the bytes back to a string
-    return hashed_password.decode("utf-8")
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed.decode('utf-8')
 
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verifies a plain password against a bcrypt hash"""
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-        )
-    to_encode.update({"exp": expire})
-    return str(jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM))
+def create_access_token(user_id: int) -> str:
+    """Creates a short-lived JWT (15 mins)"""
+    expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode = {"sub": str(user_id), "type": "access", "exp": expire}
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+def create_refresh_token_value() -> str:
+    """Creates a long-lived, opaque random string"""
+    return secrets.token_urlsafe(32)
+
+def hash_token(token: str) -> str:
+    """Hashes the refresh token using SHA-256"""
+    return hashlib.sha256(token.encode('utf-8')).hexdigest()
+
+def verify_token_hash(token: str, token_hash: str) -> bool:
+    """Checks if the raw token matches the hash in the DB"""
+    return hash_token(token) == token_hash
