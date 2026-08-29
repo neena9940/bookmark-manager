@@ -24,7 +24,7 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserResponse)
 async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
-    # ... (keep your existing register logic, just make sure to set role="user" if needed) ...
+    # ... (keep existing logic, set role="user") ...
     user = User(
         email=user_in.email,
         hashed_password=get_password_hash(user_in.password),
@@ -43,8 +43,10 @@ async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db),
 ):
-
-    # async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+    # async def login(
+    #     form_data: OAuth2PasswordRequestForm = Depends(),
+    #     db: AsyncSession = Depends(get_db)
+    # ):
     # 1. Verify User
     result = await db.execute(select(User).where(User.email == form_data.username))
     user = result.scalar_one_or_none()
@@ -77,7 +79,8 @@ async def refresh_token(
     db: AsyncSession = Depends(get_db)
 ):
     """Exchange a valid refresh token for a new access token"""
-    # 1. Find all tokens for this user (In production, you'd search by token_hash directly)
+    # 1. Find all tokens for this user
+    #    (In production, search by token_hash directly)
     result = await db.execute(
         select(RefreshToken).where(RefreshToken.revoked_at.is_(None))
     )

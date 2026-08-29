@@ -26,7 +26,8 @@ class Bookmark(Base):
     screenshot_key = Column(String, nullable=True)
 
     # Normalization - Removed
-    # tag_id = Column(Integer, ForeignKey("tags.id"), nullable=True)  # Keeping your original single tag for now
+    # tag_id = Column(Integer, ForeignKey("tags.id"))
+    # (Removed - using many-to-many relationship instead)
 
     # 3. Relationships
     owner = relationship("User", back_populates="bookmarks")
