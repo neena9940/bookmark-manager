@@ -196,6 +196,7 @@ def main_dashboard():
 
             # Display bookmarks
             for bookmark in bookmarks:
+                created_date = bookmark["created_at"][:10]
                 with st.container():
                     st.markdown(
                         f"""
