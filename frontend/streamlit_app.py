@@ -196,21 +196,27 @@ def main_dashboard():
 
             # Display bookmarks
             for bookmark in bookmarks:
+                # ✅ Extract long expressions into variables
+                tags_html = "".join([
+                    f'<span class="tag">{tag["name"]}</span>'
+                    for tag in bookmark.get("tags", [])
+                ])
                 created_date = bookmark["created_at"][:10]
+
                 with st.container():
                     st.markdown(
                         f"""
-                    <div class="bookmark-card">
-                        <h3>{bookmark["title"]}</h3>
-                        <p style="color: #666; font-size: 14px;">{bookmark["url"]}</p>
-                        <p>{bookmark.get("notes", "No summary yet...")}</p>
-                        <div>
-                            {"".join([f'<span class="tag">{tag["name"]}</span>' for tag in bookmark.get("tags", [])])}
+                        <div class="bookmark-card">
+                            <h3>{bookmark["title"]}</h3>
+                            <p style="color: #666; font-size: 14px;">{bookmark["url"]}</p>
+                            <p>{bookmark.get("notes", "No summary yet...")}</p>
+                            <div>
+                                {tags_html}
+                            </div>
+                            <small style="color: #999">Created: {created_date}</small>
                         </div>
-                        <small style="color: #999">Created: {bookmark["created_at"][:10]}</small>
-                    </div>
-                    """,
-                        unsafe_allow_html=True,
+                        """,
+                        unsafe_allow_html=True
                     )
                     st.markdown("---")
 
