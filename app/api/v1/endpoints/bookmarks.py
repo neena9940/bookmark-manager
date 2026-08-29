@@ -9,7 +9,8 @@ from app.api.deps import get_current_user
 from app.core.cache import get_cache, set_cache  # Make sure this is imported!
 from app.core.database import get_db
 from app.core.limiter import limiter
-from app.core.worker import REDIS_SETTINGS, create_pool  # NEW IMPORTS
+from app.core.worker import REDIS_SETTINGS
+from arq import create_pool # NEW IMPORTS
 from app.crud.bookmarks import get_bookmark_by_id
 from app.models.bookmark import Bookmark
 from app.models.tag import Tag
@@ -118,7 +119,7 @@ async def get_bookmarks(
 
     # 5. APPLY PAGINATION
     # Calculate OFFSET: (Page 1 = offset 0, Page 2 = offset 20, etc.)
-    offset = (page - 1) * size
+    offset = (page - 1) * size  # type: ignore[operator]
     query = query.offset(offset).limit(size)
 
     # 6. Execute the paginated query
@@ -131,7 +132,7 @@ async def get_bookmarks(
     ]
 
     # 8. Calculate total pages
-    total_pages = (total + size - 1) // size  # Ceiling division
+    total_pages = (total + size - 1) // size  # type: ignore[operator]
 
     # 9. Build the response
     response = PaginatedResponse(
