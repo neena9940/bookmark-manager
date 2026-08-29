@@ -11,4 +11,3 @@ class WorkerSettings:
     redis_settings = REDIS_SETTINGS
     functions = [summarize_bookmark]  # Tell ARQ which functions it is allowed to run
     max_jobs = 5  # Process up to 5 jobs concurrently
-

@@ -114,9 +114,7 @@ def main():
                     tag_options.get(selected_tag) if selected_tag != "None" else None
                 )
             else:
-                st.info(
-                    "No tags found. Create bookmarks with tags via the API."
-                )
+                st.info("No tags found. Create bookmarks with tags via the API.")
                 tag_id = None
 
             submitted = st.form_submit_button("Save & Generate AI Summary")

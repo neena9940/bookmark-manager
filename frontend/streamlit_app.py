@@ -90,10 +90,8 @@ def login_page():
                     time.sleep(0.5)
                     st.rerun()
                 else:
-                    detail = response.json().get('detail', 'Unknown error')
-                    st.error(
-                        f"Login failed: {detail}"
-                    )
+                    detail = response.json().get("detail", "Unknown error")
+                    st.error(f"Login failed: {detail}")
             except Exception as e:
                 st.error(f"Connection error: {str(e)}")
 
@@ -111,10 +109,8 @@ def login_page():
                 if response.status_code == 200:
                     st.success("Account created! Please login.")
                 else:
-                    detail = response.json().get('detail', 'Unknown error')
-                    st.error(
-                        f"Registration failed: {detail}"
-                    )
+                    detail = response.json().get("detail", "Unknown error")
+                    st.error(f"Registration failed: {detail}")
             except Exception as e:
                 st.error(f"Connection error: {str(e)}")
 
@@ -200,10 +196,12 @@ def main_dashboard():
             # Display bookmarks
             for bookmark in bookmarks:
                 # ✅ Extract long expressions into variables
-                tags_html = "".join([
-                    f'<span class="tag">{tag["name"]}</span>'
-                    for tag in bookmark.get("tags", [])
-                ])
+                tags_html = "".join(
+                    [
+                        f'<span class="tag">{tag["name"]}</span>'
+                        for tag in bookmark.get("tags", [])
+                    ]
+                )
                 created_date = bookmark["created_at"][:10]
 
                 with st.container():
@@ -221,7 +219,7 @@ def main_dashboard():
                             <small style="color: #999">Created: {created_date}</small>
                         </div>
                         """,
-                        unsafe_allow_html=True
+                        unsafe_allow_html=True,
                     )
                     st.markdown("---")
 
