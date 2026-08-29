@@ -190,7 +190,8 @@ def main_dashboard():
             total_pages = data["pages"]
 
             st.markdown(
-                f"**Showing {len(bookmarks)} of {total} bookmarks** (Page {page}/{total_pages})"
+                f"**Showing {len(bookmarks)} of {total} bookmarks** "
+                f"(Page {page}/{total_pages})"
             )
             st.markdown("---")
 
@@ -208,7 +209,7 @@ def main_dashboard():
                         f"""
                         <div class="bookmark-card">
                             <h3>{bookmark["title"]}</h3>
-                            <p style="color: #666; font-size: 14px;">{bookmark["url"]}</p>
+                            <p style="color: #666; font-size: 14px">{bookmark["url"]}</p>
                             <p>{bookmark.get("notes", "No summary yet...")}</p>
                             <div>
                                 {tags_html}
