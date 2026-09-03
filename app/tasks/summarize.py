@@ -1,5 +1,6 @@
 import httpx
 from sqlalchemy import select
+
 from app.core.database import AsyncSessionLocal
 from app.models.bookmark import Bookmark
 

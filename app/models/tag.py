@@ -1,5 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
+
 from app.core.database import Base
 
 # Junction table for Many-to-Many

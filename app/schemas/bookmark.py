@@ -1,5 +1,7 @@
 from datetime import datetime
+
 from pydantic import BaseModel, HttpUrl
+
 
 # 1. Tag Schema (for the response)
 class TagResponse(BaseModel):

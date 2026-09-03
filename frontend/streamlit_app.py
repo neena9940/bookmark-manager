@@ -169,9 +169,7 @@ def main_dashboard():
     # Pagination controls
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
-        page = st.number_input(
-            "Page", min_value=1, value=st.session_state.page, step=1
-        )
+        page = st.number_input("Page", min_value=1, value=st.session_state.page, step=1)
         st.session_state.page = page
     with col2:
         size = st.selectbox("Items per page", [10, 20, 50], index=1)

@@ -1,6 +1,8 @@
 from datetime import datetime
+
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+
 from app.core.database import Base
 from app.models.tag import bookmark_tag
 

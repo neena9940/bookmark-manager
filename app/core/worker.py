@@ -1,4 +1,5 @@
 from arq.connections import RedisSettings
+
 from app.tasks.summarize import summarize_bookmark
 
 # 1. Define how to connect to Redis
