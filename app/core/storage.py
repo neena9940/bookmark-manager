@@ -1,6 +1,5 @@
 import boto3
 from botocore.client import Config
-
 from app.core.config import settings
 
 # 1. Singleton variable to hold the S3 client

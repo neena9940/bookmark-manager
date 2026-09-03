@@ -1,8 +1,6 @@
 import json
 from datetime import datetime
-
 import redis.asyncio as aioredis
-
 from app.core.config import settings
 
 # Global variable to hold the Redis connection

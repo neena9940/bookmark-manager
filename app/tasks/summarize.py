@@ -1,6 +1,5 @@
 import httpx
 from sqlalchemy import select
-
 from app.core.database import AsyncSessionLocal
 from app.models.bookmark import Bookmark
 
@@ -39,8 +38,6 @@ async def summarize_bookmark(ctx, bookmark_id: int):
                     "http://localhost:11434/api/generate", json=payload
                 )
 
-                response.raise_for_status()
-                data = response.json()
                 response.raise_for_status()  # Raise error if HTTP status is 4xx or 5xx
                 data = response.json()
                 summary = data.get("response", "").strip()

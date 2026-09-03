@@ -1,5 +1,4 @@
 from typing import Generic, TypeVar
-
 from pydantic import BaseModel
 
 # This is a generic type variable (like <T> in Java/C#)

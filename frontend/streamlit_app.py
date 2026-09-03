@@ -55,6 +55,8 @@ if "access_token" not in st.session_state:
     st.session_state.access_token = None
 if "refresh_token" not in st.session_state:
     st.session_state.refresh_token = None
+if "page" not in st.session_state:
+    st.session_state.page = 1
 
 
 def get_headers():
@@ -167,11 +169,16 @@ def main_dashboard():
     # Pagination controls
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
-        page = st.number_input("Page", min_value=1, value=1, step=1)
+        page = st.number_input(
+            "Page", min_value=1, value=st.session_state.page, step=1
+        )
+        st.session_state.page = page
     with col2:
         size = st.selectbox("Items per page", [10, 20, 50], index=1)
     with col3:
         search = st.text_input("Search")
+        if search and st.session_state.page != 1:
+            st.session_state.page = 1
 
     # Fetch bookmarks
     try:
@@ -227,11 +234,13 @@ def main_dashboard():
             col1, col2, col3 = st.columns([1, 2, 1])
             with col1:
                 if page > 1:
-                    if st.button("← Previous"):
+                    if st.button("← Previous", key="prev_btn"):
+                        st.session_state.page = page - 1
                         st.rerun()
             with col3:
                 if page < total_pages:
-                    if st.button("Next →"):
+                    if st.button("Next →", key="next_btn"):
+                        st.session_state.page = page + 1
                         st.rerun()
 
         else:
