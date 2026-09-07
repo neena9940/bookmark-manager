@@ -1,4 +1,5 @@
 from sqlalchemy import select
+
 from app.core.ai_service import generate_bookmark_summary
 from app.core.database import AsyncSessionLocal
 from app.models.bookmark import Bookmark
