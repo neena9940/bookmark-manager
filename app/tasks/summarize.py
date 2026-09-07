@@ -21,7 +21,6 @@ async def summarize_bookmark(ctx, bookmark_id: int):
             return
 
         try:
-
             # This replaces all the raw httpx code you had before.
             summary = await generate_bookmark_summary(bookmark.title, bookmark.url)
 
