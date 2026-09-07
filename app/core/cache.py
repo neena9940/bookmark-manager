@@ -34,7 +34,7 @@ async def get_redis_client():
 async def set_cache(key: str, value, expire: int = 300):
     try:
         r = await get_redis_client()
-        json_str = json.dumps(value)
+        json_str = json.dumps(value, cls=DateTimeEncoder)
         print(f"🔴 Redis SET: {key} (size: {len(json_str)} bytes, expire: {expire}s)")
         await r.set(key, json_str, ex=expire)
         print("✅ Redis SET successful")

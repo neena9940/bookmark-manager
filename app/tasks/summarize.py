@@ -1,13 +1,12 @@
-import httpx
 from sqlalchemy import select
-
+from app.core.ai_service import generate_bookmark_summary
 from app.core.database import AsyncSessionLocal
 from app.models.bookmark import Bookmark
 
 
 async def summarize_bookmark(ctx, bookmark_id: int):
     """
-    Background task: fetch bookmark, call Ollama, save summary.
+    Background task: fetch bookmark, call AI service, save summary.
     """
     # 1. Create a new DB session for this background process
     async with AsyncSessionLocal() as db:
@@ -21,27 +20,9 @@ async def summarize_bookmark(ctx, bookmark_id: int):
             return
 
         try:
-            # 4. Call the local Ollama AI asynchronously
-            async with httpx.AsyncClient(timeout=60.0) as client:
-                # 1. Prepare the prompt first to keep lines short
-                prompt_text = "Summarize this webpage in one sentence: "
-                prompt_text += f"{bookmark.url}\n\nTitle: {bookmark.title}"
 
-                # 2. Prepare the JSON payload
-                payload = {
-                    "model": "llama3.2",
-                    "prompt": prompt_text,
-                    "stream": False,
-                }
-
-                # 3. Make the request
-                response = await client.post(
-                    "http://localhost:11434/api/generate", json=payload
-                )
-
-                response.raise_for_status()  # Raise error if HTTP status is 4xx or 5xx
-                data = response.json()
-                summary = data.get("response", "").strip()
+            # This replaces all the raw httpx code you had before.
+            summary = await generate_bookmark_summary(bookmark.title, bookmark.url)
 
             # 5. Save the summary to the database
             bookmark.notes = summary
