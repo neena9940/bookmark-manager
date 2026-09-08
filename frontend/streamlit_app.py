@@ -233,7 +233,7 @@ def main_dashboard():
                         "Choose an image",
                         type=["png", "jpg", "jpeg"],
                         key=f"upload_{bookmark['id']}",
-                        label_visibility="collapsed"
+                        label_visibility="collapsed",
                     )
 
                     if uploaded_file is not None:
@@ -243,29 +243,32 @@ def main_dashboard():
                                     "file": (
                                         uploaded_file.name,
                                         uploaded_file.getvalue(),
-                                        uploaded_file.type
+                                        uploaded_file.type,
                                     )
                                 }
 
                                 response = requests.post(
                                     f"{API_URL}/bookmarks/{bookmark['id']}/screenshot",
                                     headers=get_headers(),
-                                    files=files
+                                    files=files,
                                 )
 
                                 if response.status_code == 200:
                                     data = response.json()
                                     st.success("✅ Uploaded!")
                                     # Show tiny preview with expand option
-                                    with st.expander("📸 View Screenshot",
-                                                     expanded=False):
-                                        st.image(data["screenshot_url"],
-                                                 use_container_width=True)
+                                    with st.expander(
+                                        "📸 View Screenshot", expanded=False
+                                    ):
+                                        st.image(
+                                            data["screenshot_url"],
+                                            use_container_width=True,
+                                        )
 
                                     st.image(
                                         data["screenshot_url"],
                                         caption="Screenshot",
-                                        width=300
+                                        width=300,
                                     )
                                 else:
                                     st.error(f"Upload failed: {response.text}")
