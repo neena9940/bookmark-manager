@@ -257,8 +257,10 @@ def main_dashboard():
                                     data = response.json()
                                     st.success("✅ Uploaded!")
                                     # Show tiny preview with expand option
-                                    with st.expander("📸 View Screenshot", expanded=False):
-                                        st.image(data["screenshot_url"], use_container_width=True)
+                                    with st.expander("📸 View Screenshot",
+                                                     expanded=False):
+                                        st.image(data["screenshot_url"],
+                                                 use_container_width=True)
 
                                     st.image(
                                         data["screenshot_url"],
