@@ -226,7 +226,59 @@ def main_dashboard():
                         """,
                         unsafe_allow_html=True,
                     )
-                    st.markdown("---")
+
+                    # 📸 ADD THIS: Screenshot Upload Section
+                    st.markdown("**📸 Upload Screenshot:**")
+                    uploaded_file = st.file_uploader(
+                        "Choose an image",
+                        type=["png", "jpg", "jpeg"],
+                        key=f"upload_{bookmark['id']}",
+                        label_visibility="collapsed"
+                    )
+
+                    if uploaded_file is not None:
+                        try:
+                            with st.spinner("Uploading..."):
+                                files = {
+                                    "file": (
+                                        uploaded_file.name,
+                                        uploaded_file.getvalue(),
+                                        uploaded_file.type
+                                    )
+                                }
+
+                                response = requests.post(
+                                    f"{API_URL}/bookmarks/{bookmark['id']}/screenshot",
+                                    headers=get_headers(),
+                                    files=files
+                                )
+
+                                if response.status_code == 200:
+                                    data = response.json()
+                                    st.success("✅ Uploaded!")
+                                    # Show tiny preview with expand option
+                                    with st.expander("📸 View Screenshot", expanded=False):
+                                        st.image(data["screenshot_url"], use_container_width=True)
+
+                                    st.image(
+                                        data["screenshot_url"],
+                                        caption="Screenshot",
+                                        width=300
+                                    )
+                                else:
+                                    st.error(f"Upload failed: {response.text}")
+                        except Exception as e:
+                            st.error(f"Error: {str(e)}")
+
+                    # Show existing screenshot if available
+                    if bookmark.get("screenshot_key"):
+                        st.markdown("---")
+                        st.markdown("**📸 Current Screenshot:**")
+                        # You'll need to create an endpoint to get the presigned URL
+                        # For now, we'll skip this part
+                        # st.image(presigned_url, use_column_width=True)
+
+                    st.markdown("---")  # The separator
 
             # Navigation
             col1, col2, col3 = st.columns([1, 2, 1])
